@@ -654,13 +654,17 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2084019586430331887, guid: d1e20634c8b2b8b4da891d2537d290dc, type: 3}
+      propertyPath: Priority
+      value: 67
+      objectReference: {fileID: 0}
+    - target: {fileID: 2084019586430331887, guid: d1e20634c8b2b8b4da891d2537d290dc, type: 3}
       propertyPath: m_Volume
-      value: 0.65
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2084019586430331887, guid: d1e20634c8b2b8b4da891d2537d290dc, type: 3}
       propertyPath: m_audioClip
       value: 
-      objectReference: {fileID: 8300000, guid: de56072cad534b14f91656c4a539f8db, type: 3}
+      objectReference: {fileID: 8300000, guid: e9e5f2fb33cbab544bc53be20a4c4dcc, type: 3}
     - target: {fileID: 9123687083811103546, guid: d1e20634c8b2b8b4da891d2537d290dc, type: 3}
       propertyPath: m_Name
       value: Fireball
