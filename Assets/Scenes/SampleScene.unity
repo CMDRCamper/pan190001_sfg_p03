@@ -172,7 +172,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56f84a5fa63e33242bf42b7f21f83a29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bufferTime: 2
+  bufferTime: 6
   fireballAudio: {fileID: 1582480598}
   attackClip: {fileID: 8300000, guid: 9c5381ea941491e4a8c01f5fb6c47512, type: 3}
   fireballClip: {fileID: 8300000, guid: 4a91bdaee41a21b4696a7c62bb0c483d, type: 3}

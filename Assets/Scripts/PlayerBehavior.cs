@@ -5,15 +5,15 @@ using UnityEngine;
 public class PlayerBehavior : MonoBehaviour
 {
     private string UInput;
-    [SerializeField] float bufferTime;
-    private Queue<InputClass> inputBuffer = new Queue<InputClass>();
-    private InputClass[] searchBuffer = new InputClass[16];
-    private ArrayList fireballArray = new ArrayList();
+    [SerializeField] int bufferTime;
+    private Queue<string> inputBuffer = new Queue<string>();
+    private string[] searchBuffer;
     private bool canTakeInputs = true;
     private bool downFound = false;
     private bool downRightFound = false;
     private bool rightFound = false;
     private bool canAct = true;
+    private bool QCFExecuted = false;
     private Animator playerAnim;
     [SerializeField] AudioSource fireballAudio;
     [SerializeField] AudioClip attackClip;
@@ -28,14 +28,7 @@ public class PlayerBehavior : MonoBehaviour
         playerRB = GetComponent<Rigidbody>();
         playerAnim = GetComponent<Animator>();
         playerAudio = GetComponent<AudioSource>();
-        InputClass motionInput = new InputClass("Down", bufferTime);
-        fireballArray.Add(motionInput);
-        motionInput = new InputClass("Down-right", bufferTime);
-        fireballArray.Add(motionInput);
-        motionInput = new InputClass("Right", bufferTime);
-        fireballArray.Add(motionInput);
-        motionInput = new InputClass("Attack", bufferTime);
-        fireballArray.Add(motionInput);
+        searchBuffer = new string[bufferTime];
     }
 
     // Update is called once per frame
@@ -54,10 +47,10 @@ public class PlayerBehavior : MonoBehaviour
         if(Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.D))
         {
             UInput = "Left";
-            InputClass motionInput = new InputClass(UInput, bufferTime);
+            
             if (canTakeInputs)
             {
-                inputBuffer.Enqueue(motionInput);
+                inputBuffer.Enqueue(UInput);
                 canTakeInputs = false;
                 StartCoroutine(ResetInput());
             }
@@ -65,10 +58,10 @@ public class PlayerBehavior : MonoBehaviour
         if (Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.A))
         {
             UInput = "Right";
-            InputClass motionInput = new InputClass(UInput, bufferTime);
+        
             if (canTakeInputs)
             {
-                inputBuffer.Enqueue(motionInput);
+                inputBuffer.Enqueue(UInput);
                 canTakeInputs = false;
                 StartCoroutine(ResetInput());
             }
@@ -76,10 +69,10 @@ public class PlayerBehavior : MonoBehaviour
         if (Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
         {
             UInput = "Up";
-            InputClass motionInput = new InputClass(UInput, bufferTime);
+          
             if (canTakeInputs)
             {
-                inputBuffer.Enqueue(motionInput);
+                inputBuffer.Enqueue(UInput);
                 canTakeInputs = false;
                 StartCoroutine(ResetInput());
             }
@@ -87,10 +80,10 @@ public class PlayerBehavior : MonoBehaviour
         if (Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.A))
         {
             UInput = "Down";
-            InputClass motionInput = new InputClass(UInput, bufferTime);
+           
             if (canTakeInputs)
             {
-                inputBuffer.Enqueue(motionInput);
+                inputBuffer.Enqueue(UInput);
                 canTakeInputs = false;
                 StartCoroutine(ResetInput());
             }
@@ -98,10 +91,10 @@ public class PlayerBehavior : MonoBehaviour
         if(Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.D))
         {
             UInput = "Down-left";
-            InputClass motionInput = new InputClass(UInput, bufferTime);
+           
             if (canTakeInputs)
             {
-                inputBuffer.Enqueue(motionInput);
+                inputBuffer.Enqueue(UInput);
                 canTakeInputs = false;
                 StartCoroutine(ResetInput());
             }
@@ -109,10 +102,10 @@ public class PlayerBehavior : MonoBehaviour
         if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.D))
         {
             UInput = "Up-left";
-            InputClass motionInput = new InputClass(UInput, bufferTime);
+           
             if (canTakeInputs)
             {
-                inputBuffer.Enqueue(motionInput);
+                inputBuffer.Enqueue(UInput);
                 canTakeInputs = false;
                 StartCoroutine(ResetInput());
             }
@@ -120,10 +113,10 @@ public class PlayerBehavior : MonoBehaviour
         if (Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.A))
         {
             UInput = "Down-right";
-            InputClass motionInput = new InputClass(UInput, bufferTime);
+            
             if (canTakeInputs)
             {
-                inputBuffer.Enqueue(motionInput);
+                inputBuffer.Enqueue(UInput);
                 canTakeInputs = false;
                 StartCoroutine(ResetInput());
             }
@@ -131,10 +124,10 @@ public class PlayerBehavior : MonoBehaviour
         if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.A))
         {
             UInput = "Up-right";
-            InputClass motionInput = new InputClass(UInput, bufferTime);
+            
             if (canTakeInputs)
             {
-                inputBuffer.Enqueue(motionInput);
+                inputBuffer.Enqueue(UInput);
                 canTakeInputs = false;
                 StartCoroutine(ResetInput());
             }
@@ -142,10 +135,10 @@ public class PlayerBehavior : MonoBehaviour
         if (!Input.anyKey)
         {
             UInput = "Neutral";
-            InputClass motionInput = new InputClass(UInput, bufferTime);
+            
             if (canTakeInputs)
             {
-                inputBuffer.Enqueue(motionInput);
+                inputBuffer.Enqueue(UInput);
                 canTakeInputs = false;
                 StartCoroutine(ResetInput());
             }
@@ -153,56 +146,32 @@ public class PlayerBehavior : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.J))
         {
 
-            searchBuffer = inputBuffer.ToArray();
-            for (int i = 0; i < searchBuffer.Length; i++)
-            {
-                
-                if (searchBuffer[i].getInputDir() == "Down" && !downFound && !downRightFound && !rightFound)
-                {
-                    
-                    downFound = true;
-                    
-                }
-                if (searchBuffer[i].getInputDir() == "Down-right" && downFound && !downRightFound && !rightFound)
-                {
-                    
-                    downRightFound = true;
-
-                }
-                if (searchBuffer[i].getInputDir() == "Right" && downFound && downRightFound && !rightFound)
-                {
-                    
-                    rightFound = true;
-
-                }
-
-
-            }
-
+            //When player presses a button has a motion input been performed?
+            QCFExecuted = checkForQCF();
+            //Kill input that is done too early during inactionable state
             StartCoroutine(fireballDecay());
-            
-            if(downFound && downRightFound && rightFound && canAct)
+            //perform action depending on whether or not a motion input has been performed.
+            if(QCFExecuted && canAct)
             {
                 UInput = "HADOKEN!!!!";
                 throwFireball();
             }
-            else if(!downFound && canAct || !downRightFound && canAct || !rightFound && canAct)
+            else if(!QCFExecuted && canAct)
             {
                 UInput = "Attack";
                 Attack();
-                
             }
                 
             
-            InputClass motionInput = new InputClass(UInput, bufferTime);
+            //Record input in buffer
             if (canTakeInputs)
             {
-                inputBuffer.Enqueue(motionInput);
+                inputBuffer.Enqueue(UInput);
                 canTakeInputs = false;
                 StartCoroutine(ResetInput());
             }
         }
-        if(inputBuffer.Count >= 16)
+        if(inputBuffer.Count >= bufferTime)
         {
             inputBuffer.Dequeue();
         }
@@ -211,6 +180,33 @@ public class PlayerBehavior : MonoBehaviour
         
     }
 
+    private bool checkForQCF()
+    {
+        bool execution = false; ;
+        searchBuffer = inputBuffer.ToArray();
+        for (int i = 0; i < searchBuffer.Length; i++)
+        {
+            if (searchBuffer[i] == "Down" && !downFound && !downRightFound && !rightFound)
+            {
+                downFound = true;
+            }
+            if (searchBuffer[i] == "Down-right" && downFound && !downRightFound && !rightFound)
+            {
+                downRightFound = true;
+            }
+            if (searchBuffer[i] == "Right" && downFound && downRightFound && !rightFound)
+            {
+                rightFound = true;
+            }
+        }
+
+        if(downFound && downRightFound && rightFound)
+        {
+            execution = true;
+        }
+
+        return execution;
+    }
 
     private void Attack()
     {
@@ -256,8 +252,6 @@ public class PlayerBehavior : MonoBehaviour
     private IEnumerator fireballDecay()
     {
         yield return new WaitForSeconds(.26f);
-        downFound = false;
-        downRightFound = false;
-        rightFound = false;
+        QCFExecuted = false;
     }
 }
